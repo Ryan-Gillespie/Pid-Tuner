@@ -21,12 +21,16 @@ class Population:
         self.population = population
 
     def weighted_population(self):
+        best = 0
         self.weightedPop = []
         for individual in self.population:
             try:
                 weight = 1 / abs((self.target - self.fit(individual, self.target)) / self.target)
             except ZeroDivisionError:
                 weight = 100
+            if (weight > best):
+                best = weight
+                self.best = individual
             self.weightedPop.append([individual, weight])
         return self.weightedPop
 
@@ -60,8 +64,11 @@ class Population:
 
     # get the best individual (highest weight)
     def bestInd(self):
-        ind = sorted(self.weighted_population(), key=lambda x: x[1], reverse=True)[0]
-        return [ind[0], self.fit(ind[0], self.target)]
+        if self.best is None:
+            ind = sorted(self.weighted_population(), key=lambda x: x[1], reverse=True)[0]
+            return [ind[0], self.fit(ind[0], self.target)]
+        else:
+            return [self.best, self.fit(self.best, self.target)]
 
     def evolve(self, iterations):
         for i in range(iterations):
